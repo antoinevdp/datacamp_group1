@@ -1,1 +1,6 @@
-# datacamp_scrapping
+# datacamp_scraping
+
+---
+
+## Tools used
+Selenium
