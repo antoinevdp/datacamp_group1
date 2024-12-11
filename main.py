@@ -139,7 +139,14 @@ class SteamScrapping:
                 )
                 self.findTagElementException(xpath, key_index)
             except Exception as e:
-                self.results["results"]["games"][self.key_games[key_index]].update({"Tags": []})
+                try:
+                    xpath = "/html/body/div[4]/div[1]/div/div[2]/div/div[2]/div[1]/div[8]/div[1]"
+                    element_present = WebDriverWait(self.driver, 1).until(
+                        EC.presence_of_element_located((By.XPATH, xpath))
+                    )
+                    self.findTagElementException(xpath, key_index)
+                except Exception as e:
+                    self.results["results"]["games"][self.key_games[key_index]].update({"Tags": []})
 
     def getCurrentPrice(self, key_index):
         try :
