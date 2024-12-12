@@ -1,12 +1,13 @@
-import time, re, datetime, json
-
+import datetime, json
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.select import Select
-from matplotlib import pyplot as plt
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
 from tqdm import tqdm
+from s3connector import uploadFileToS3
+
+
 
 
 class SteamScrapping:
@@ -14,6 +15,11 @@ class SteamScrapping:
     def __init__(self):
         options = webdriver.FirefoxOptions()
         options.add_argument("--headless")
+        options.add_argument("--incognito")
+        options.set_preference('network.proxy.type', 1)  # Enable manual proxy configuration
+        options.set_preference('network.proxy.socks', '127.0.0.1')  # Tor SOCKS5 proxy
+        options.set_preference('network.proxy.socks_port', 9050)
+        options.set_preference('network.proxy.socks_remote_dns', True)  # Use Tor for DNS resolution
         self.driver = webdriver.Firefox(options=options)
 
         self.link_games = []
@@ -146,6 +152,7 @@ class SteamScrapping:
                     )
                     self.findTagElementException(xpath, key_index)
                 except Exception as e:
+                    print("Can't get Tags")
                     self.results["results"]["games"][self.key_games[key_index]].update({"Tags": []})
 
     def getCurrentPrice(self, key_index):
@@ -170,6 +177,7 @@ class SteamScrapping:
         self.driver.quit()
 
 if __name__ == '__main__':
+
     scraper = SteamScrapping()
     scraper.getTopGamesInfo("25")
 
@@ -181,6 +189,13 @@ if __name__ == '__main__':
         scraper.getTagGame(i)
         scraper.getCurrentPrice(i)
 
-    with open('results.json', 'w') as outfile:
+
+    filename = f"result-{datetime.datetime.now().strftime("%Y%m%d%H%M%S")}.json"
+
+    with open(f'results/{filename}', 'w') as outfile:
         outfile.write(json.dumps(scraper.results, indent=4))
+
+    uploadFileToS3(filename)
+
+
 
