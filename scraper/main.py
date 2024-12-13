@@ -7,9 +7,6 @@ from selenium.webdriver.support.wait import WebDriverWait
 from tqdm import tqdm
 from s3connector import uploadFileToS3
 
-
-
-
 class SteamScrapping:
 
     def __init__(self):
@@ -188,6 +185,7 @@ if __name__ == '__main__':
         scraper.getMonthlyPlayer(i)
         scraper.getTagGame(i)
         scraper.getCurrentPrice(i)
+        break
 
 
     filename = f"result-{datetime.datetime.now().strftime("%Y%m%d%H%M%S")}.json"
